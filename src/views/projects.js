@@ -44,19 +44,15 @@ export async function renderProjectsView(container) {
 
   // Active projects list
   if (projects.length === 0) {
+    // M3 fix: No duplicate button in the empty state. The header already
+    // contains a "Create Project" button; adding another in the empty
+    // state created two identical buttons side by side.
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     empty.innerHTML = `
       <div class="empty-state__title">${t('projects_no_active')}</div>
       <div class="empty-state__text">${t('projects_no_active_text')}</div>
     `;
-    const createBtn2 = document.createElement('button');
-    createBtn2.className = 'btn btn--primary';
-    createBtn2.textContent = t('projects_create');
-    createBtn2.addEventListener('click', () => {
-      openProjectForm({ onSave: () => renderProjectsView(container) });
-    });
-    empty.appendChild(createBtn2);
     container.appendChild(empty);
   } else {
     const list = document.createElement('div');

@@ -283,17 +283,15 @@ async function upsertRecord(record, now = Date.now()) {
   }
 
   if (mergeTarget) {
-    // Merge: accumulate duration, combine notes.
+    // Merge: accumulate duration, combine notes — all in a single
+    // atomic transaction (S1 fix). Previously delete + put were separate
+    // transactions; if the process was interrupted between them, the
+    // source record would be deleted but the merge target never updated,
+    // causing data loss.
     const mergedDuration = (mergeTarget.durationMinutes || 0) + incomingDuration;
     const mergedNote = combineNotes(mergeTarget.note, incomingNote);
 
-    // If we're editing an existing record and moving it to a date/project
-    // that already has a record, delete the source record after merging.
-    if (existingById && existingById.id !== mergeTarget.id) {
-      await deleteOne(STORES.RECORDS, existingById.id);
-    }
-
-    const data = {
+    const keeperData = {
       id: mergeTarget.id,
       projectId: mergeTarget.projectId,
       date: mergeTarget.date,
@@ -302,8 +300,25 @@ async function upsertRecord(record, now = Date.now()) {
       createdAt: mergeTarget.createdAt ?? now,
       updatedAt: now,
     };
-    await putOne(STORES.RECORDS, data);
-    return data;
+
+    const db = await openDB();
+    const transaction = db.transaction(STORES.RECORDS, 'readwrite');
+    const store = transaction.objectStore(STORES.RECORDS);
+
+    // Delete source record (if editing/moving) within the same transaction
+    if (existingById && existingById.id !== mergeTarget.id) {
+      store.delete(existingById.id);
+    }
+    // Write merged data within the same transaction
+    store.put(keeperData);
+
+    await new Promise((resolve, reject) => {
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
+    });
+
+    return keeperData;
   }
 
   // No existing record and no merge target — create a new one.
@@ -324,6 +339,13 @@ async function upsertRecord(record, now = Date.now()) {
 /**
  * Combine two note strings. If both are non-empty, join with a separator.
  * If one is empty, return the other. If both empty, return empty string.
+ *
+ * S2 fix: deduplication is now token-based rather than substring-based.
+ * Each note is split on " | " into segments; duplicate segments (exact
+ * match after trimming) are removed. This prevents both identical-note
+ * duplication ("A | A") and the false-positive problem where a short
+ * note that happens to be a substring of a longer one was incorrectly
+ * treated as a duplicate.
  */
 function combineNotes(existingNote, newNote) {
   const e = (existingNote || '').trim();
@@ -331,8 +353,18 @@ function combineNotes(existingNote, newNote) {
   if (!e && !n) return '';
   if (!e) return n;
   if (!n) return e;
-  if (e === n) return e; // identical — don't duplicate
-  return `${e} | ${n}`;
+
+  // Split both into segments, dedupe, preserve order (existing first)
+  const segments = [...e.split(' | '), ...n.split(' | ')].map(s => s.trim()).filter(Boolean);
+  const seen = new Set();
+  const unique = [];
+  for (const seg of segments) {
+    if (!seen.has(seg)) {
+      seen.add(seg);
+      unique.push(seg);
+    }
+  }
+  return unique.join(' | ');
 }
 
 /**
@@ -430,11 +462,12 @@ export async function normalizeRecords() {
     group.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
     const keeper = { ...group[0] };
     keeper.durationMinutes = group.reduce((sum, r) => sum + (r.durationMinutes || 0), 0);
-    keeper.note = group.map(r => (r.note || '').trim()).filter(n => n).reduce((acc, n) => {
-      if (!acc) return n;
-      if (acc.includes(n)) return acc;
-      return `${acc} | ${n}`;
-    }, '');
+
+    // S2 fix: use the same token-based combineNotes logic for consistency.
+    // Previously used .includes() which caused false-positive deduplication
+    // (e.g. "A" being treated as duplicate of "A | B") and also caused
+    // duplicate text when notes differed only by whitespace.
+    keeper.note = group.reduce((acc, r) => combineNotes(acc, r.note || ''), '');
 
     // Mark all others for deletion
     for (let i = 1; i < group.length; i++) {

@@ -118,7 +118,7 @@ export async function renderHomeView(container) {
   timerBtn.innerHTML = `<span class="nav-icon" style="width:18px;height:18px;">${icon('timer')}</span> ${t('home_start_timer')}`;
   timerBtn.addEventListener('click', () => {
     // Timer comes in Phase 3; for now route to statistics or show toast
-    showToast('Timer coming in Phase 3');
+    showToast(t('toast_timer_phase3'));
   });
 
   const addBtn = document.createElement('button');

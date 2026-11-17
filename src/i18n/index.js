@@ -104,6 +104,32 @@ const translations = {
     month_1: 'January', month_2: 'February', month_3: 'March', month_4: 'April',
     month_5: 'May', month_6: 'June', month_7: 'July', month_8: 'August',
     month_9: 'September', month_10: 'October', month_11: 'November', month_12: 'December',
+
+    /* Calendar */
+    cal_no_activity: 'No activity yet',
+    cal_no_activity_text: 'Recorded days will appear here.',
+    cal_recorded_days: 'Recorded Days',
+    cal_nothing_recorded: 'Nothing recorded',
+    cal_nothing_recorded_text: 'Add a record for this day to capture time you spent here.',
+    cal_record_count: '{count} record(s)',
+    cal_recorded: 'recorded',
+
+    /* Project detail */
+    pd_time_summary: 'Time Summary',
+    pd_history: 'History',
+    pd_no_records: 'No records yet. Add your first record to start tracking.',
+    pd_view_all: 'View All ({count})',
+    pd_actions: 'Actions',
+    pd_not_found: 'Project not found',
+
+    /* Settings & Statistics placeholders */
+    settings_title: 'Settings',
+    settings_placeholder_text: 'Appearance, language, data export/import, and about info will be built in Phase 4.',
+    statistics_title: 'Statistics',
+    statistics_placeholder_text: 'Overview statistics, time-by-project charts, and trends will be built in Phase 3.',
+
+    /* Toasts */
+    toast_timer_phase3: '计时功能将在第三阶段推出',
   },
 
   zh: {
@@ -192,6 +218,32 @@ const translations = {
     month_1: '一月', month_2: '二月', month_3: '三月', month_4: '四月',
     month_5: '五月', month_6: '六月', month_7: '七月', month_8: '八月',
     month_9: '九月', month_10: '十月', month_11: '十一月', month_12: '十二月',
+
+    /* 日历 */
+    cal_no_activity: '暂无记录',
+    cal_no_activity_text: '已记录的日期会显示在这里。',
+    cal_recorded_days: '已记录日期',
+    cal_nothing_recorded: '暂无记录',
+    cal_nothing_recorded_text: '为这一天添加记录，记录你在这里投入的时间。',
+    cal_record_count: '{count} 条记录',
+    cal_recorded: '已记录',
+
+    /* 项目详情 */
+    pd_time_summary: '时间概览',
+    pd_history: '历史记录',
+    pd_no_records: '还没有记录。添加第一条记录，开始追踪。',
+    pd_view_all: '查看全部（{count}）',
+    pd_actions: '操作',
+    pd_not_found: '未找到项目',
+
+    /* 设置与统计占位 */
+    settings_title: '设置',
+    settings_placeholder_text: '外观、语言、数据导入导出和关于信息将在第四阶段开发。',
+    statistics_title: '统计',
+    statistics_placeholder_text: '概览统计、按项目的时间图表和趋势将在第三阶段开发。',
+
+    /* 提示 */
+    toast_timer_phase3: '计时功能将在第三阶段推出',
   },
 };
 

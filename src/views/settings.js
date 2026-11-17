@@ -16,8 +16,8 @@ export async function renderSettingsView(container) {
   const placeholder = document.createElement('div');
   placeholder.className = 'empty-state';
   placeholder.innerHTML = `
-    <div class="empty-state__title">Settings</div>
-    <div class="empty-state__text">Appearance (light/dark/system), language switching, data export/import, and about info will be built in Phase 4.</div>
+    <div class="empty-state__title">${t('settings_title')}</div>
+    <div class="empty-state__text">${t('settings_placeholder_text')}</div>
   `;
   container.appendChild(placeholder);
 }

@@ -1,6 +1,7 @@
 /**
  * Utility functions: ID generation, date handling, duration formatting.
  */
+import { getLanguage } from '../i18n/index.js';
 
 /* ---- ID generation ---- */
 export function generateId() {
@@ -14,38 +15,46 @@ export function generateId() {
 
 /**
  * Format minutes into a compact human-readable string.
- * Examples: 30 -> "30m", 90 -> "1h 30m", 120 -> "2h", 286 -> "4h 46m"
+ * EN: "30m", "1h 30m", "2h"  ZH: "30分钟", "1小时30分钟", "2小时"
  */
 export function formatDuration(minutes) {
-  if (!minutes || minutes <= 0) return '0m';
+  const lang = getLanguage();
+  const unitH = lang === 'zh' ? '小时' : 'h';
+  const unitM = lang === 'zh' ? '分钟' : 'm';
+  if (!minutes || minutes <= 0) return `0${unitM}`;
   const total = Math.round(minutes);
   const hours = Math.floor(total / 60);
   const mins = total % 60;
-  if (hours === 0) return `${mins}m`;
-  if (mins === 0) return `${hours}h`;
-  return `${hours}h ${mins}m`;
+  if (hours === 0) return `${mins}${unitM}`;
+  if (mins === 0) return `${hours}${unitH}`;
+  return `${hours}${unitH} ${mins}${unitM}`;
 }
 
 /**
- * Format minutes into a decimal-hours string like "18.5 hrs".
+ * Format minutes into a decimal-hours string.
+ * EN: "18.5 hrs"  ZH: "18.5 小时"
  */
 export function formatHours(minutes) {
-  if (!minutes || minutes <= 0) return '0 hrs';
+  const lang = getLanguage();
+  const unit = lang === 'zh' ? '小时' : 'hrs';
+  if (!minutes || minutes <= 0) return `0 ${unit}`;
   const hours = minutes / 60;
   const rounded = Math.round(hours * 10) / 10;
-  return `${rounded} hrs`;
+  return `${rounded} ${unit}`;
 }
 
 /**
- * Format minutes into a short compact form used in list rows: "18.5 hrs" / "286 hrs"
+ * Format minutes into a short compact form used in list rows.
+ * EN: "18.5 hrs" / "286 hrs"  ZH: "18.5 小时" / "286 小时"
  */
 export function formatHoursShort(minutes) {
-  if (!minutes || minutes <= 0) return '0 hrs';
+  const lang = getLanguage();
+  const unit = lang === 'zh' ? '小时' : 'hrs';
+  if (!minutes || minutes <= 0) return `0 ${unit}`;
   const hours = minutes / 60;
-  // If whole number, no decimal
-  if (Number.isInteger(hours)) return `${hours} hrs`;
+  if (Number.isInteger(hours)) return `${hours} ${unit}`;
   const rounded = Math.round(hours * 10) / 10;
-  return `${rounded} hrs`;
+  return `${rounded} ${unit}`;
 }
 
 /* ---- Date utilities (all local, Monday-first week) ---- */
@@ -108,10 +117,16 @@ export function getDayIndexMonday(date) {
 }
 
 /**
- * Format a date for display in Daily Detail: e.g. "Monday, 5 January 2025".
+ * Format a date for display in Daily Detail.
+ * EN: "Monday, 5 January 2025"  ZH: "2025年1月5日 星期一"
  */
 export function formatDateLong(dateKey) {
   const d = keyToDate(dateKey);
+  const lang = getLanguage();
+  if (lang === 'zh') {
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${weekdays[d.getDay()]}`;
+  }
   const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const months = ['January', 'February', 'March', 'April', 'May', 'June',
                   'July', 'August', 'September', 'October', 'November', 'December'];
@@ -119,19 +134,29 @@ export function formatDateLong(dateKey) {
 }
 
 /**
- * Format a date for compact display: "5 Jan 2025"
+ * Format a date for compact display.
+ * EN: "5 Jan 2025"  ZH: "2025年1月5日"
  */
 export function formatDateShort(dateKey) {
   const d = keyToDate(dateKey);
+  const lang = getLanguage();
+  if (lang === 'zh') {
+    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  }
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 /**
- * Format a month-year label: "January 2025"
+ * Format a month-year label.
+ * EN: "January 2025"  ZH: "2025年1月"
  */
 export function formatMonthLabel(year, monthIndex) {
+  const lang = getLanguage();
+  if (lang === 'zh') {
+    return `${year}年${monthIndex + 1}月`;
+  }
   const months = ['January', 'February', 'March', 'April', 'May', 'June',
                   'July', 'August', 'September', 'October', 'November', 'December'];
   return `${months[monthIndex]} ${year}`;

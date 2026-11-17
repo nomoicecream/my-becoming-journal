@@ -18,8 +18,8 @@ export async function renderStatisticsView(container) {
   const placeholder = document.createElement('div');
   placeholder.className = 'empty-state';
   placeholder.innerHTML = `
-    <div class="empty-state__title">Statistics</div>
-    <div class="empty-state__text">Overview statistics, time-by-project charts, and trends will be built in Phase 3.</div>
+    <div class="empty-state__title">${t('statistics_title')}</div>
+    <div class="empty-state__text">${t('statistics_placeholder_text')}</div>
   `;
   container.appendChild(placeholder);
 }

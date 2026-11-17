@@ -38,8 +38,8 @@ export async function renderCalendarView(container) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     empty.innerHTML = `
-      <div class="empty-state__title">No activity yet</div>
-      <div class="empty-state__text">Recorded days will appear here. The monthly calendar grid arrives in Phase 2.</div>
+      <div class="empty-state__title">${t('cal_no_activity')}</div>
+      <div class="empty-state__text">${t('cal_no_activity_text')}</div>
     `;
     container.appendChild(empty);
     return;
@@ -47,7 +47,7 @@ export async function renderCalendarView(container) {
 
   const listLabel = document.createElement('div');
   listLabel.className = 'section-label';
-  listLabel.textContent = 'Recorded Days';
+  listLabel.textContent = t('cal_recorded_days');
   container.appendChild(listLabel);
 
   const list = document.createElement('div');
@@ -59,7 +59,7 @@ export async function renderCalendarView(container) {
     row.innerHTML = `
       <div class="list-row__main">
         <div class="list-row__name">${formatDateLong(dateKey)}</div>
-        <div class="list-row__meta">${dayRecords.length} record${dayRecords.length > 1 ? 's' : ''}</div>
+        <div class="list-row__meta">${t('cal_record_count', { count: dayRecords.length })}</div>
       </div>
       <div class="list-row__times">
         <div class="list-row__time-main">${formatDuration(dayTotal)}</div>
@@ -121,7 +121,7 @@ export async function renderDailyDetailView(container, params) {
   if (filterProject) {
     sub.innerHTML = `<span class="list-row__colour" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${filterProject.colourHex};margin-right:6px;vertical-align:middle;"></span>${filterProject.name} · ${formatDuration(total)}`;
   } else {
-    sub.textContent = `${formatDuration(total)} recorded`;
+    sub.textContent = `${formatDuration(total)} ${t('cal_recorded')}`;
   }
   header.appendChild(title);
   header.appendChild(sub);
@@ -131,8 +131,8 @@ export async function renderDailyDetailView(container, params) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     empty.innerHTML = `
-      <div class="empty-state__title">Nothing recorded</div>
-      <div class="empty-state__text">Add a record for this day if you'd like to capture time you spent here.</div>
+      <div class="empty-state__title">${t('cal_nothing_recorded')}</div>
+      <div class="empty-state__text">${t('cal_nothing_recorded_text')}</div>
     `;
     container.appendChild(empty);
   } else {

@@ -14,6 +14,7 @@ import { renderStatisticsView } from './views/statistics.js';
 import { renderSettingsView } from './views/settings.js';
 
 const APP_VERSION = '1.0.0';
+const MIGRATION_FLAG = 'recordsNormalizedV1';
 
 function getContentEl() {
   return document.getElementById('app-content');
@@ -33,10 +34,15 @@ async function init() {
   // Initialise IndexedDB
   await openDB();
 
-  // Run safe data migration: normalize duplicate project/date records
-  // (one record per project per day). Idempotent — safe to run every launch.
+  // M1 fix: Run data migration only ONCE, using a persistent flag in
+  // settings. Previously normalizeRecords() ran on every app launch,
+  // causing unnecessary DB reads even when records were already clean.
   try {
-    await normalizeRecords();
+    const settings = await getSettings();
+    if (!settings[MIGRATION_FLAG]) {
+      await normalizeRecords();
+      await saveSettings({ [MIGRATION_FLAG]: true });
+    }
   } catch (e) {
     console.warn('Record normalization skipped:', e);
   }

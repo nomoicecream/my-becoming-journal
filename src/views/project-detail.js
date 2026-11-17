@@ -16,7 +16,7 @@ export async function renderProjectDetailView(container, params) {
   const projectId = params.id;
   const project = await getProject(projectId);
   if (!project) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-state__title">Project not found</div></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="empty-state__title">${t('pd_not_found')}</div></div>`;
     return;
   }
 
@@ -59,7 +59,7 @@ export async function renderProjectDetailView(container, params) {
 
   const summaryLabel = document.createElement('div');
   summaryLabel.className = 'section-label';
-  summaryLabel.textContent = 'Time Summary';
+  summaryLabel.textContent = t('pd_time_summary');
   container.appendChild(summaryLabel);
 
   const stats = document.createElement('div');
@@ -80,7 +80,7 @@ export async function renderProjectDetailView(container, params) {
   const historyLabel = document.createElement('div');
   historyLabel.className = 'section-label';
   historyLabel.style.marginTop = '32px';
-  historyLabel.textContent = 'History';
+  historyLabel.textContent = t('pd_history');
   container.appendChild(historyLabel);
 
   // Group records by date
@@ -95,7 +95,7 @@ export async function renderProjectDetailView(container, params) {
   if (sortedDates.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
-    empty.innerHTML = `<div class="empty-state__text">No records yet. Add your first record to start tracking.</div>`;
+    empty.innerHTML = `<div class="empty-state__text">${t('pd_no_records')}</div>`;
     container.appendChild(empty);
   } else {
     const INITIAL_LIMIT = 20;
@@ -113,7 +113,7 @@ export async function renderProjectDetailView(container, params) {
       const viewAll = document.createElement('button');
       viewAll.className = 'btn btn--text';
       viewAll.style.cssText = 'margin-top:8px;';
-      viewAll.textContent = `View All (${sortedDates.length})`;
+      viewAll.textContent = t('pd_view_all', { count: sortedDates.length });
       viewAll.addEventListener('click', () => {
         // Expand the remaining dates in place
         for (const dateKey of remaining) {
@@ -129,7 +129,7 @@ export async function renderProjectDetailView(container, params) {
   const actionsLabel = document.createElement('div');
   actionsLabel.className = 'section-label';
   actionsLabel.style.marginTop = '32px';
-  actionsLabel.textContent = 'Actions';
+  actionsLabel.textContent = t('pd_actions');
   container.appendChild(actionsLabel);
 
   const actions = document.createElement('div');
