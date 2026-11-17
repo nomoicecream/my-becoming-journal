@@ -129,7 +129,28 @@ const translations = {
     statistics_placeholder_text: 'Overview statistics, time-by-project charts, and trends will be built in Phase 3.',
 
     /* Toasts */
-    toast_timer_phase3: '计时功能将在第三阶段推出',
+    toast_timer_phase3: 'Timer coming in Phase 3',
+
+    /* Timer */
+    timer_title: 'Focus Timer',
+    timer_elapsed: 'Elapsed',
+    timer_pause: 'Pause',
+    timer_resume: 'Resume',
+    timer_stop: 'Stop',
+    timer_save_prompt: 'Log this time to a project',
+    timer_running: 'Running',
+    timer_paused: 'Paused',
+    timer_bar_tap: 'Tap to return to timer',
+
+    /* History inline edit */
+    history_edit_duration: 'Edit Duration',
+    history_delete_confirm: 'Delete all records for this project on this day? This cannot be undone.',
+
+    /* Projects hint */
+    projects_hint_text: 'Long-press or right-click a project to edit, archive, or delete',
+
+    /* Record form (timer save) */
+    record_from_timer: 'Timer stopped — select a project and confirm the duration',
   },
 
   zh: {

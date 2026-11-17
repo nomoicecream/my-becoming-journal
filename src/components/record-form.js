@@ -14,9 +14,10 @@ import { t } from '../i18n/index.js';
  * @param {Object|null} options.record - existing record to edit (null = new)
  * @param {string|null} options.projectId - pre-selected project
  * @param {string|null} options.date - pre-selected date (YYYY-MM-DD)
+ * @param {number|null} options.durationMinutes - pre-filled duration (from timer)
  * @param {Function} options.onSave - callback after save
  */
-export async function openRecordForm({ record = null, projectId = null, date = null, onSave } = {}) {
+export async function openRecordForm({ record = null, projectId = null, date = null, durationMinutes = null, onSave } = {}) {
   const isEdit = !!record;
   const projects = await getActiveProjects();
   const settings = await getSettings();
@@ -27,7 +28,7 @@ export async function openRecordForm({ record = null, projectId = null, date = n
     ?? (projects[0]?.id || null);
   const currentDate = record?.date ?? date ?? todayKey();
   // Split stored minutes back into hours + minutes for editing
-  const totalMin = record?.durationMinutes ?? 25;
+  const totalMin = record?.durationMinutes ?? durationMinutes ?? 25;
   const currentHours = Math.floor(totalMin / 60);
   const currentMinutes = totalMin % 60;
   const currentNote = record?.note ?? '';

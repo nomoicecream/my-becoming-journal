@@ -6,7 +6,7 @@
 import { getActiveProjects, getAllRecords, getSettings } from '../db/database.js';
 import { formatHoursShort, formatDuration, isThisMonth } from '../utils/helpers.js';
 import { icon } from '../components/icons.js';
-import { openRecordForm } from '../components/record-form.js';
+import { startTimer } from '../components/timer.js';
 import { openProjectForm } from '../components/project-form.js';
 import { showToast } from '../components/ui.js';
 import { t } from '../i18n/index.js';
@@ -102,7 +102,7 @@ export async function renderHomeView(container) {
     container.appendChild(list);
   }
 
-  // Quick actions
+  // Quick actions — only Start Timer (Add Record is in project detail)
   const quick = document.createElement('div');
   quick.className = 'quick-actions';
   const quickText = document.createElement('div');
@@ -114,22 +114,13 @@ export async function renderHomeView(container) {
   buttons.className = 'quick-actions__buttons';
 
   const timerBtn = document.createElement('button');
-  timerBtn.className = 'btn btn--primary';
+  timerBtn.className = 'btn btn--primary btn--block';
   timerBtn.innerHTML = `<span class="nav-icon" style="width:18px;height:18px;">${icon('timer')}</span> ${t('home_start_timer')}`;
   timerBtn.addEventListener('click', () => {
-    // Timer comes in Phase 3; for now route to statistics or show toast
-    showToast(t('toast_timer_phase3'));
-  });
-
-  const addBtn = document.createElement('button');
-  addBtn.className = 'btn btn--secondary';
-  addBtn.innerHTML = `<span class="nav-icon" style="width:18px;height:18px;">${icon('plus')}</span> ${t('home_add_record')}`;
-  addBtn.addEventListener('click', () => {
-    openRecordForm({ onSave: () => renderHomeView(container) });
+    startTimer();
   });
 
   buttons.appendChild(timerBtn);
-  buttons.appendChild(addBtn);
   quick.appendChild(buttons);
   container.appendChild(quick);
 }

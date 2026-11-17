@@ -2,7 +2,7 @@
  * Projects view — list of active projects with management functions.
  * Features: create, edit, archive, delete, drag-to-reorder.
  */
-import { getActiveProjects, getArchivedProjects, saveProject, deleteProjectWithRecords, getAllRecords, reorderProjects, getRecordsByProject, deleteRecord } from '../db/database.js';
+import { getActiveProjects, getArchivedProjects, saveProject, deleteProjectWithRecords, getAllRecords, reorderProjects, getRecordsByProject, deleteRecord, getSettings, saveSettings } from '../db/database.js';
 import { formatHoursShort, isThisMonth } from '../utils/helpers.js';
 import { icon } from '../components/icons.js';
 import { openProjectForm } from '../components/project-form.js';
@@ -38,6 +38,23 @@ export async function renderProjectsView(container) {
   header.appendChild(title);
   header.appendChild(createBtn);
   container.appendChild(header);
+
+  // First-visit hint: long-press or right-click to manage projects
+  const settings = await getSettings();
+  if (!settings.projectsHintSeen) {
+    const hint = document.createElement('div');
+    hint.className = 'projects-hint';
+    hint.innerHTML = `<span class="nav-icon" style="width:16px;height:16px;flex-shrink:0;">${icon('edit')}</span><span>${t('projects_hint_text')}</span>`;
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'projects-hint__close';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', async () => {
+      hint.remove();
+      await saveSettings({ projectsHintSeen: true });
+    });
+    hint.appendChild(closeBtn);
+    container.appendChild(hint);
+  }
 
   const projects = await getActiveProjects();
   const records = await getAllRecords();
