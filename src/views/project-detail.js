@@ -6,11 +6,10 @@
 import { getProject, getRecordsByProject, getAllRecords, saveRecord, deleteRecord } from '../db/database.js';
 import { formatHoursShort, formatDuration, formatDateLong, formatDateShort, isThisMonth, keyToDate, todayKey } from '../utils/helpers.js';
 import { icon } from '../components/icons.js';
-import { openProjectForm } from '../components/project-form.js';
 import { openRecordForm } from '../components/record-form.js';
 import { confirmDialog, showToast, openModal } from '../components/ui.js';
 import { t } from '../i18n/index.js';
-import { navigate, navigateBack } from '../utils/router.js';
+import { navigateBack } from '../utils/router.js';
 
 export async function renderProjectDetailView(container, params) {
   const projectId = params.id;
@@ -142,15 +141,7 @@ export async function renderProjectDetailView(container, params) {
     openRecordForm({ projectId, onSave: () => renderProjectDetailView(container, params) });
   });
 
-  const editBtn = document.createElement('button');
-  editBtn.className = 'btn btn--secondary';
-  editBtn.innerHTML = `<span class="nav-icon" style="width:18px;height:18px;">${icon('edit')}</span> ${t('projects_edit')}`;
-  editBtn.addEventListener('click', () => {
-    openProjectForm({ project, onSave: () => renderProjectDetailView(container, params) });
-  });
-
   actions.appendChild(addBtn);
-  actions.appendChild(editBtn);
   container.appendChild(actions);
 }
 
@@ -159,12 +150,10 @@ export async function renderProjectDetailView(container, params) {
  * for that project on that date (right).
  *
  * Interactions:
- *   - Click the duration → opens an inline edit modal to overwrite the
- *     combined duration for that day.
+ *   - Click anywhere on the row → opens an inline edit modal to
+ *     overwrite the combined duration + note for that day. No navigation.
  *   - Swipe left → reveals a delete button; tapping it asks for
  *     confirmation, then deletes all records for this project on that day.
- *   - Click elsewhere on the row → navigates to project-filtered Daily
- *     Detail for that date (existing behaviour).
  */
 function createHistoryRow(dateKey, dayRecords, projectId, container, params) {
   const dayTotal = dayRecords.reduce((sum, r) => sum + (r.durationMinutes || 0), 0);
@@ -206,21 +195,13 @@ function createHistoryRow(dateKey, dayRecords, projectId, container, params) {
       <div class="list-row__name">${formatDateShort(dateKey)}</div>
     </div>
     <div class="list-row__times history-row__duration">
-      <div class="list-row__time-main" data-role="duration-display">${formatDuration(dayTotal)}</div>
+      <div class="list-row__time-main">${formatDuration(dayTotal)}</div>
     </div>
-    <span class="list-row__chevron nav-icon">${icon('chevron_right')}</span>
   `;
 
-  // Click on duration → inline edit modal
-  const durationEl = row.querySelector('[data-role="duration-display"]');
-  durationEl.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openInlineDurationEdit(dateKey, dayRecords, projectId, container, params);
-  });
-
-  // Click on row (not duration) → navigate to Daily Detail
+  // Click anywhere on the row → inline edit modal (no navigation)
   row.addEventListener('click', () => {
-    navigate(`/calendar/${dateKey}?project=${projectId}`);
+    openInlineDurationEdit(dateKey, dayRecords, projectId, container, params);
   });
 
   swipeContainer.appendChild(swipeActions);

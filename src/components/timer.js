@@ -88,9 +88,8 @@ export function stopTimer() {
   hideTimerOverlay();
   hideFloatingBar();
 
-  if (totalMinutes <= 0) return;
-
-  // Open record form pre-filled with the elapsed duration
+  // Always open the record form — even if elapsed time is very short.
+  // The user can manually adjust the duration in the form.
   openRecordForm({
     date: todayKey(),
     durationMinutes: totalMinutes,

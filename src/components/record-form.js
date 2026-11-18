@@ -5,7 +5,7 @@
  */
 import { getActiveProjects, getSettings, saveSettings, saveRecord } from '../db/database.js';
 import { generateId, todayKey } from '../utils/helpers.js';
-import { openModal } from './ui.js';
+import { openModal, showToast } from './ui.js';
 import { t } from '../i18n/index.js';
 
 /**
@@ -75,6 +75,19 @@ export async function openRecordForm({ record = null, projectId = null, date = n
   dateInput.className = 'form-input';
   dateInput.value = currentDate;
   dateInput.max = todayKey();
+
+  // JS-level real-time validation: if the user manages to pick a future
+  // date (some browsers allow it despite the max attribute), immediately
+  // reset the value and show a visual error.
+  dateInput.addEventListener('change', () => {
+    if (dateInput.value && dateInput.value > todayKey()) {
+      dateInput.value = todayKey();
+      dateInput.style.borderColor = 'var(--brick-red)';
+      showToast(t('record_date_future_blocked'));
+      setTimeout(() => { dateInput.style.borderColor = ''; }, 2000);
+    }
+  });
+
   dateGroup.appendChild(dateLabel);
   dateGroup.appendChild(dateInput);
 
@@ -167,6 +180,15 @@ export async function openRecordForm({ record = null, projectId = null, date = n
         variant: 'btn--primary',
         onClick: async () => {
           if (!dateInput.value) {
+            dateInput.focus();
+            return false;
+          }
+
+          // Double-check: reject future dates (browser max attr may not
+          // be enforced on all platforms)
+          if (dateInput.value > todayKey()) {
+            dateInput.style.borderColor = 'var(--brick-red)';
+            showToast(t('record_date_future_blocked'));
             dateInput.focus();
             return false;
           }
